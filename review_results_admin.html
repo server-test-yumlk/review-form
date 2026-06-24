@@ -11,7 +11,9 @@
       ▼ 編集エリア：基本的にここだけ変更してください
       ========================================================= */
     const EDIT_CONFIG = {
-      shopName: '〇〇焼肉店',
+      shopName: '焼肉 秀',
+      logoUrl: 'images/logo.jpg',
+      logoAlt: '焼肉 秀 ロゴ',
       adminTitle: '改善アンケート集計',
       adminLead: '低評価時に送信された改善項目の集計結果です。',
       resetButtonText: '集計データをリセット',
@@ -71,12 +73,12 @@
       padding: 28px 22px;
     }
 
-    .shop-name {
-      margin: 0 0 6px;
-      text-align: center;
-      font-size: 15px;
-      font-weight: 700;
-      color: var(--main);
+    .shop-logo {
+      display: block;
+      width: min(260px, 82%);
+      max-height: 120px;
+      object-fit: contain;
+      margin: 0 auto 16px;
     }
 
     h1 {
@@ -206,7 +208,7 @@
 <body>
   <main class="page">
     <section class="card" aria-labelledby="adminTitle">
-      <p id="shopName" class="shop-name"></p>
+      <img id="shopLogo" class="shop-logo" src="" alt="" />
       <h1 id="adminTitle"></h1>
       <p id="adminLead" class="lead"></p>
 
@@ -243,7 +245,9 @@
       document.documentElement.style.setProperty('--border', EDIT_CONFIG.colors.border);
 
       document.title = `${EDIT_CONFIG.shopName}｜集計確認`;
-      document.getElementById('shopName').textContent = EDIT_CONFIG.shopName;
+      const shopLogo = document.getElementById('shopLogo');
+      shopLogo.src = EDIT_CONFIG.logoUrl;
+      shopLogo.alt = EDIT_CONFIG.logoAlt || EDIT_CONFIG.shopName;
       document.getElementById('adminTitle').textContent = EDIT_CONFIG.adminTitle;
       document.getElementById('adminLead').textContent = EDIT_CONFIG.adminLead;
       document.getElementById('resetButton').textContent = EDIT_CONFIG.resetButtonText;
