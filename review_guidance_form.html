@@ -10,10 +10,11 @@
       ▼ 編集エリア：基本的にここだけ変更してください
       ========================================================= */
     const EDIT_CONFIG = {
+      shopName: 'ウッシーナ',
       logoImageUrl: 'images/logo.jpg',
 
-      mainTitle: '本日はご来店ありがとうございました',
-      mainLead: '今後のサービス向上のため、満足度をお聞かせください。',
+      mainTitle: '本日はご来店<br>ありがとうございました',
+      mainLead: '今後のサービス向上のため、<br>満足度をお聞かせください。',
       selectLabel: '満足度を選択してください',
       submitButtonText: '送信',
       noSelectAlertText: '満足度を選択してください。',
@@ -27,6 +28,8 @@
       improvementSubmitText: '確認する',
       thanksTitle: 'ご回答ありがとうございました',
       thanksLead: 'いただいた内容は、今後のサービス改善に活用いたします。',
+      closeButtonText: 'ページを閉じる',
+      closeNoteText: 'ページを閉じられない場合は、ブラウザやアプリの戻るボタンで閉じてください。',
 
       colors: {
         main: '#1f7a5a',
@@ -181,6 +184,24 @@
       transform: translateY(1px);
     }
 
+    .btn-sub {
+      margin-top: 18px;
+      background: #555;
+      box-shadow: none;
+    }
+
+    .btn-sub:hover {
+      background: #333;
+    }
+
+    .close-note {
+      display: none;
+      margin: 12px 0 0;
+      text-align: center;
+      font-size: 13px;
+      color: #666;
+    }
+
     .form-area {
       display: grid;
       gap: 14px;
@@ -304,9 +325,12 @@
     </section>
 
     <section id="thanksScreen" class="card hidden" aria-labelledby="thanksTitle">
+      <img id="thanksLogo" class="logo" src="" alt="店舗ロゴ" />
       <p id="thanksShopName" class="shop-name"></p>
       <h1 id="thanksTitle"></h1>
       <p id="thanksLead" class="lead"></p>
+      <button id="closeButton" class="btn btn-sub" type="button" onclick="closePage()"></button>
+      <p id="closeNote" class="close-note"></p>
     </section>
   </main>
 
@@ -325,8 +349,8 @@
       setText('shopName', EDIT_CONFIG.shopName);
       setText('improvementShopName', EDIT_CONFIG.shopName);
       setText('thanksShopName', EDIT_CONFIG.shopName);
-      setText('mainTitle', EDIT_CONFIG.mainTitle);
-      setText('mainLead', EDIT_CONFIG.mainLead);
+      setHtml('mainTitle', EDIT_CONFIG.mainTitle);
+      setHtml('mainLead', EDIT_CONFIG.mainLead);
       setText('selectLabel', EDIT_CONFIG.selectLabel);
       setText('mainSubmitButton', EDIT_CONFIG.submitButtonText);
       setText('improvementTitle', EDIT_CONFIG.improvementTitle);
@@ -334,6 +358,8 @@
       setText('improvementSubmitButton', EDIT_CONFIG.improvementSubmitText);
       setText('thanksTitle', EDIT_CONFIG.thanksTitle);
       setText('thanksLead', EDIT_CONFIG.thanksLead);
+      setText('closeButton', EDIT_CONFIG.closeButtonText);
+      setText('closeNote', EDIT_CONFIG.closeNoteText);
 
       const logoIds = ['logo', 'improvementLogo', 'thanksLogo'];
       const shopNameIds = ['shopName', 'improvementShopName', 'thanksShopName'];
@@ -352,6 +378,10 @@
 
     function setText(id, text) {
       document.getElementById(id).textContent = text;
+    }
+
+    function setHtml(id, html) {
+      document.getElementById(id).innerHTML = html;
     }
 
     function submitRating() {
@@ -386,6 +416,13 @@
 
       saveData(data);
       showScreen('thanksScreen');
+    }
+
+    function closePage() {
+      window.close();
+      setTimeout(() => {
+        document.getElementById('closeNote').style.display = 'block';
+      }, 200);
     }
 
     function loadData() {
