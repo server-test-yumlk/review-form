@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>口コミアンケート｜集計確認</title>
+
+  <script>
+    /* =========================================================
+      ▼ 編集エリア：基本的にここだけ変更してください
+      ========================================================= */
+    const EDIT_CONFIG = {
+      shopName: '〇〇焼肉店',
+      adminTitle: '改善アンケート集計',
+      adminLead: '低評価時に送信された改善項目の集計結果です。',
+      resetButtonText: '集計データをリセット',
+      resetConfirmText: '集計データをすべて削除します。よろしいですか？',
+
+      colors: {
+        main: '#1f7a5a',
+        mainDark: '#165d44',
+        bg: '#f6f8f7',
+        text: '#222222',
+        border: '#d9e1dd'
+      }
+    };
+    /* =========================================================
+      ▲ 編集エリアここまで
+      ========================================================= */
+  </script>
+
+  <style>
+    :root {
+      --main: #1f7a5a;
+      --main-dark: #165d44;
+      --bg: #f6f8f7;
+      --text: #222222;
+      --border: #d9e1dd;
+      --white: #ffffff;
+      --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      --danger: #b42318;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', 'Yu Gothic', Meiryo, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+    }
+
+    .card {
+      width: 100%;
+      max-width: 560px;
+      background: var(--white);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 28px 22px;
+    }
+
+    .shop-name {
+      margin: 0 0 6px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--main);
+    }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-size: 24px;
+      line-height: 1.35;
+      letter-spacing: 0.02em;
+    }
+
+    .lead {
+      margin: 14px 0 24px;
+      text-align: center;
+      font-size: 15px;
+      color: #555;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 22px;
+    }
+
+    .summary-box {
+      padding: 18px 14px;
+      border: 1px solid rgba(31, 122, 90, 0.2);
+      border-radius: 16px;
+      background: rgba(31, 122, 90, 0.08);
+      text-align: center;
+    }
+
+    .summary-box span {
+      display: block;
+      font-size: 13px;
+      color: #555;
+    }
+
+    .summary-box strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 28px;
+      line-height: 1.2;
+      color: var(--main);
+    }
+
+    .history {
+      margin-top: 20px;
+      padding-top: 18px;
+      border-top: 1px solid var(--border);
+    }
+
+    .history h2 {
+      margin: 0 0 12px;
+      font-size: 17px;
+    }
+
+    .history-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .history-list li {
+      padding: 12px;
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 14px;
+      word-break: break-word;
+    }
+
+    .date {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: #777;
+    }
+
+    .empty {
+      margin: 0;
+      padding: 14px;
+      border: 1px dashed var(--border);
+      border-radius: 12px;
+      color: #666;
+      text-align: center;
+      font-size: 14px;
+    }
+
+    .btn-danger {
+      width: 100%;
+      margin-top: 24px;
+      border: 1px solid rgba(180, 35, 24, 0.25);
+      border-radius: 999px;
+      padding: 13px 18px;
+      background: #fff;
+      color: var(--danger);
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .note {
+      margin: 14px 0 0;
+      color: #777;
+      font-size: 12px;
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 24px 18px;
+      }
+
+      h1 {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <section class="card" aria-labelledby="adminTitle">
+      <p id="shopName" class="shop-name"></p>
+      <h1 id="adminTitle"></h1>
+      <p id="adminLead" class="lead"></p>
+
+      <div class="summary-grid" aria-label="集計結果">
+        <div class="summary-box">
+          <span>価格</span>
+          <strong id="priceCount">0</strong>
+        </div>
+        <div class="summary-box">
+          <span>接客</span>
+          <strong id="serviceCount">0</strong>
+        </div>
+      </div>
+
+      <div class="history">
+        <h2>自由記入欄の履歴</h2>
+        <ul id="historyList" class="history-list"></ul>
+        <p id="emptyText" class="empty">自由記入欄の回答はまだありません。</p>
+      </div>
+
+      <button id="resetButton" class="btn-danger" type="button" onclick="resetData()"></button>
+      <p class="note">このページのURLは公開ページには掲載していません。</p>
+    </section>
+  </main>
+
+  <script>
+    const STORAGE_KEY = 'reviewImprovementData';
+
+    function applyConfig() {
+      document.documentElement.style.setProperty('--main', EDIT_CONFIG.colors.main);
+      document.documentElement.style.setProperty('--main-dark', EDIT_CONFIG.colors.mainDark);
+      document.documentElement.style.setProperty('--bg', EDIT_CONFIG.colors.bg);
+      document.documentElement.style.setProperty('--text', EDIT_CONFIG.colors.text);
+      document.documentElement.style.setProperty('--border', EDIT_CONFIG.colors.border);
+
+      document.title = `${EDIT_CONFIG.shopName}｜集計確認`;
+      document.getElementById('shopName').textContent = EDIT_CONFIG.shopName;
+      document.getElementById('adminTitle').textContent = EDIT_CONFIG.adminTitle;
+      document.getElementById('adminLead').textContent = EDIT_CONFIG.adminLead;
+      document.getElementById('resetButton').textContent = EDIT_CONFIG.resetButtonText;
+    }
+
+    function loadData() {
+      const defaultData = { priceCount: 0, serviceCount: 0, freeTextHistory: [] };
+      try {
+        return JSON.parse(localStorage.getItem(STORAGE_KEY)) || defaultData;
+      } catch (error) {
+        return defaultData;
+      }
+    }
+
+    function renderData() {
+      const data = loadData();
+      document.getElementById('priceCount').textContent = data.priceCount;
+      document.getElementById('serviceCount').textContent = data.serviceCount;
+
+      const historyList = document.getElementById('historyList');
+      const emptyText = document.getElementById('emptyText');
+      historyList.innerHTML = '';
+
+      if (!data.freeTextHistory.length) {
+        emptyText.style.display = 'block';
+        return;
+      }
+
+      emptyText.style.display = 'none';
+      data.freeTextHistory.slice().reverse().forEach((item) => {
+        const li = document.createElement('li');
+        const date = document.createElement('span');
+        date.className = 'date';
+        date.textContent = item.createdAt;
+        li.appendChild(date);
+        li.appendChild(document.createTextNode(item.text));
+        historyList.appendChild(li);
+      });
+    }
+
+    function resetData() {
+      if (!confirm(EDIT_CONFIG.resetConfirmText)) return;
+      localStorage.removeItem(STORAGE_KEY);
+      renderData();
+    }
+
+    applyConfig();
+    renderData();
+  </script>
+</body>
+</html>
