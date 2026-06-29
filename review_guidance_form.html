@@ -335,6 +335,13 @@
 
   <script>
     const positiveRatings = ['satisfied', 'somewhat-satisfied', 'normal'];
+    const ratingLabels = {
+      satisfied: '満足',
+      'somewhat-satisfied': 'やや満足',
+      normal: '普通',
+      'somewhat-dissatisfied': 'やや不満',
+      dissatisfied: '不満'
+    };
     let selectedRating = '';
     const STORAGE_KEY = 'reviewImprovementData';
 
@@ -408,12 +415,10 @@
       button.textContent = '送信中...';
 
       const payload = {
-        rating: selectedRating || 'low-rating',
+        rating: ratingLabels[selectedRating] || '',
         price: document.getElementById('priceCheck').checked,
         service: document.getElementById('serviceCheck').checked,
-        comment: document.getElementById('freeText').value.trim(),
-        userAgent: navigator.userAgent,
-        pageUrl: location.href
+        comment: document.getElementById('freeText').value.trim()
       };
 
       try {
