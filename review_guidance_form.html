@@ -10,7 +10,6 @@
       ▼ 編集エリア：基本的にここだけ変更してください
       ========================================================= */
     const EDIT_CONFIG = {
-      shopName: 'ウッシーナ',
       logoImageUrl: 'images/logo.jpg',
 
       mainTitle: '本日はご来店<br>ありがとうございました',
@@ -20,8 +19,8 @@
       noSelectAlertText: '満足度を選択してください。',
 
       googleReviewUrl: 'https://example.com/review',
-      lowRatingUrl: '#improvement-form',
-      // 集計結果は review_results_admin.html で確認できます（公開ページからはリンクしません）,
+      lowRatingUrl: '#improvement-form', // 低評価時は改善フォーム画面を表示
+      spreadsheetPostUrl: 'https://script.google.com/macros/s/AKfycbznPeyIu63fh3cio0My46Fo6t59wvzofY6FhVx2iNQVcMo_wNlsYlA2Qj5U_NiNLuIp/exec', // 仮URL：Apps ScriptのウェブアプリURLに差し替えてください
 
       improvementTitle: 'ご意見をお聞かせください',
       improvementLead: 'その他、改善してほしい箇所はありましたか？',
@@ -336,6 +335,7 @@
 
   <script>
     const positiveRatings = ['satisfied', 'somewhat-satisfied', 'normal'];
+    let selectedRating = '';
     const STORAGE_KEY = 'reviewImprovementData';
 
     function applyConfig() {
@@ -345,10 +345,10 @@
       document.documentElement.style.setProperty('--text', EDIT_CONFIG.colors.text);
       document.documentElement.style.setProperty('--border', EDIT_CONFIG.colors.border);
 
-      document.title = `${EDIT_CONFIG.shopName}｜口コミアンケート`;
-      setText('shopName', EDIT_CONFIG.shopName);
-      setText('improvementShopName', EDIT_CONFIG.shopName);
-      setText('thanksShopName', EDIT_CONFIG.shopName);
+      document.title = '口コミアンケート';
+      setText('shopName', '');
+      setText('improvementShopName', '');
+      setText('thanksShopName', '');
       setHtml('mainTitle', EDIT_CONFIG.mainTitle);
       setHtml('mainLead', EDIT_CONFIG.mainLead);
       setText('selectLabel', EDIT_CONFIG.selectLabel);
@@ -367,7 +367,7 @@
         logoIds.forEach((id) => {
           const logo = document.getElementById(id);
           logo.src = EDIT_CONFIG.logoImageUrl;
-          logo.alt = `${EDIT_CONFIG.shopName} ロゴ`;
+          logo.alt = '店舗ロゴ';
           logo.style.display = 'block';
         });
         shopNameIds.forEach((id) => {
@@ -391,31 +391,48 @@
         return;
       }
 
+      selectedRating = checked.value;
+
       if (positiveRatings.includes(checked.value)) {
         location.href = EDIT_CONFIG.googleReviewUrl;
       } else {
-        location.href = EDIT_CONFIG.lowRatingUrl;
+        location.hash = EDIT_CONFIG.lowRatingUrl;
         showScreen('improvementScreen');
       }
     }
 
-    function submitImprovement() {
-      const priceChecked = document.getElementById('priceCheck').checked;
-      const serviceChecked = document.getElementById('serviceCheck').checked;
-      const freeText = document.getElementById('freeText').value.trim();
-      const data = loadData();
+    async function submitImprovement() {
+      const button = document.getElementById('improvementSubmitButton');
+      const originalText = button.textContent;
+      button.disabled = true;
+      button.textContent = '送信中...';
 
-      if (priceChecked) data.priceCount += 1;
-      if (serviceChecked) data.serviceCount += 1;
-      if (freeText) {
-        data.freeTextHistory.push({
-          text: freeText,
-          createdAt: new Date().toLocaleString('ja-JP')
+      const payload = {
+        rating: selectedRating || 'low-rating',
+        price: document.getElementById('priceCheck').checked,
+        service: document.getElementById('serviceCheck').checked,
+        comment: document.getElementById('freeText').value.trim(),
+        userAgent: navigator.userAgent,
+        pageUrl: location.href
+      };
+
+      try {
+        await fetch(EDIT_CONFIG.spreadsheetPostUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: {
+            'Content-Type': 'text/plain;charset=utf-8'
+          },
+          body: JSON.stringify(payload)
         });
-      }
 
-      saveData(data);
-      showScreen('thanksScreen');
+        showScreen('thanksScreen');
+        location.hash = '#thanks';
+      } catch (error) {
+        alert('送信できませんでした。時間をおいて再度お試しください。');
+        button.disabled = false;
+        button.textContent = originalText;
+      }
     }
 
     function closePage() {
@@ -447,6 +464,8 @@
     function routeByHash() {
       if (location.hash === '#improvement-form') {
         showScreen('improvementScreen');
+      } else if (location.hash === '#thanks') {
+        showScreen('thanksScreen');
       } else {
         showScreen('ratingScreen');
       }
